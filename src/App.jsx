@@ -1,422 +1,677 @@
-// App.jsx
-import { useState, useEffect } from 'react';
+// ============================================================
+// APP.JSX
+// ============================================================
+
+import { useState, useEffect } from "react";
+
 import {
   BrowserRouter,
   Routes,
   Route,
   NavLink,
-  useLocation,
   useNavigate,
   useParams,
-} from 'react-router-dom';
-import './index.css';
-import './App.css';
+} from "react-router-dom";
 
-// Clé API OMDb (Open Movie Database) — récupérée sur https://www.omdbapi.com/apikey.aspx
-const OMDB_API_KEY = "c73348c8";
+import "./App.css";
 
 // ============================================================
-// FILMS DU CAROUSEL (bandeau du haut)
+// IMPORT DES PAGES
 // ============================================================
-// Les images doivent être dans le dossier public/images/
-// (donc le fichier réel est à : public/images/evil-dead-burn.jpeg)
-// Le chemin ici commence par /images/... et PAS /public/images/...
-//
-// "id" sert à construire l'URL de la page détail (/film/:id).
-// "trailer" est l'URL d'embed YouTube (format https://www.youtube.com/embed/XXXXXXXX).
-const CAROUSEL_MOVIES = [
-  {
-    id: "lodyssee",
-    title: "L'odysée",
-    genre: "Aventure",
-    synopsis: "Un voyage épique à travers des mondes inconnus, entre péril et découverte.",
-    poster: "/images/lodyssee.jpeg",
-    banner: "/images/lodyssee-banner.png",
-    background: "linear-gradient(to bottom, rgb(7, 7, 7), rgb(124, 74, 17))",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ", // à remplacer par le vrai trailer
-  },
-  {
-    id: "girl-from-nowhere",
-    title: "Girl From Nowhere",
-    genre: "Série",
-    synopsis: "Une histoire captivante mêlant suspense, émotion et rebondissements.",
-    poster: "/images/girl-from-nowhere.jpeg",
-    banner: "/images/girl-from-nowhere-banner.jpeg",
-    background: "linear-gradient(to bottom, rgb(140, 148, 180), rgb(100, 110, 185))",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ", // à remplacer par le vrai trailer
-  },
-  {
-    id: "evil-dead-burn",
-    title: "Evil Dead Burn",
-    genre: "Horreur",
-    synopsis: "Une nuit de terreur où le mal ancien se réveille et ne laisse aucune chance à ses victimes.",
-    poster: "/images/evil-dead-burn.jpeg",
-    banner: "/images/evil-dead-burn-banner.jpeg",
-    background: "linear-gradient(to bottom, rgb(120, 0, 0), rgb(0, 0, 0))",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ", // à remplacer par le vrai trailer
-  },
-];
+
+import Films from "./Pages/films.jsx";
+import Series from "./Pages/series.jsx";
 
 // ============================================================
-// FILMS DES CARTES (grille en dessous du carousel)
+// IMPORT DES DONNÉES
 // ============================================================
-// Liste INDÉPENDANTE du carousel — ajoute ici tes propres films/séries,
-// même s'ils sont différents de ceux du carousel.
-const CARD_MOVIES = [
-  {
-    id: "lodyssee",
-    title: "L'odysée",
-    genre: "Aventure",
-    synopsis: "Un voyage épique à travers des mondes inconnus, entre péril et découverte.",
-    poster: "/images/lodyssee.jpeg",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    id: "girl-from-nowhere",
-    title: "Girl From Nowhere",
-    genre: "Série",
-    synopsis: "Une histoire captivante mêlant suspense, émotion et rebondissements.",
-    poster: "/images/girl-from-nowhere.jpeg",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    id: "evil-dead-burn",
-    title: "Evil Dead Burn",
-    genre: "Horreur",
-    synopsis: "Une nuit de terreur où le mal ancien se réveille et ne laisse aucune chance à ses victimes.",
-    poster: "/images/evil-dead-burn.jpeg",
-    trailer: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  // Ajoute d'autres films/séries ici librement, sans toucher au carousel.
-];
 
-// Liste combinée utilisée uniquement pour retrouver un film par son id
-// (nécessaire pour que la page détail fonctionne peu importe d'où vient le clic).
-const ALL_MOVIES = [...CAROUSEL_MOVIES, ...CARD_MOVIES];
+import {
+  CAROUSEL_MOVIES,
+  CARD_MOVIES,
+  findMovieById,
+} from "./Data/movie.jsx";
 
-function findMovieById(id) {
-  // On évite les doublons si le même id existe dans les deux listes
-  return ALL_MOVIES.find((m) => m.id === id);
+// ============================================================
+// IMPORT DE LA PAGE DÉTAIL
+// ============================================================
+
+import Details from "./details.jsx";
+
+// ============================================================
+// GESTION DES IMAGES
+// ============================================================
+
+const BASE_URL = import.meta.env.BASE_URL;
+
+function getImagePath(path) {
+  if (!path) {
+    return "";
+  }
+
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://")
+  ) {
+    return path;
+  }
+
+  return `${BASE_URL}${path.replace(/^\/+/, "")}`;
 }
 
-// ---------------------- SIDEBAR (VERTICALE, GAUCHE) ----------------------
+// ============================================================
+// REDIRECTION VERS ACCUEIL APRÈS UN RECHARGEMENT
+// ============================================================
+
+function ReloadToHome() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const navigation =
+      performance.getEntriesByType("navigation")[0];
+
+    if (
+      navigation &&
+      navigation.type === "reload"
+    ) {
+      const currentPath = window.location.pathname;
+
+      const basePath = BASE_URL.replace(/\/+$/, "");
+
+      const isHome =
+        currentPath === "/" ||
+        currentPath === "" ||
+        currentPath === basePath ||
+        currentPath === `${basePath}/`;
+
+      if (!isHome) {
+        navigate("/", {
+          replace: true,
+        });
+      }
+    }
+  }, [navigate]);
+
+  return null;
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+
 function Sidebar() {
   return (
     <nav className="sidebar">
-      <div className="sidebar-logo">🎬 WatchNext</div>
+
+      <div className="sidebar-logo">
+        🎬 WatchNext
+      </div>
+
       <ul className="sidebar-links">
-        <li><NavLink to="/" end>Accueil</NavLink></li>
-        <li><NavLink to="/favoris">Favoris</NavLink></li>
-        <li><NavLink to="/note">Notes</NavLink></li>
-        <li><NavLink to="/apropos">À propos</NavLink></li>
+
+        <li>
+          <NavLink to="/" end>
+            Accueil
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/favoris">
+            Favoris
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/note">
+            Notes
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/apropos">
+            À propos
+          </NavLink>
+        </li>
+
       </ul>
+
     </nav>
   );
 }
 
-// ---------------------- TOP NAVBAR (FILMS / SÉRIES) ----------------------
+// ============================================================
+// BARRE DU HAUT
+// ============================================================
+
 function TopNavbar() {
-  const location = useLocation();
-  const isHome = location.pathname === '/';
+  const navigate = useNavigate();
 
   return (
     <div className="top-navbar">
+
       <ul className="top-navbar-links">
-        <li><NavLink to="/films">Films</NavLink></li>
-        <li><NavLink to="/series">Séries</NavLink></li>
+
+        <li>
+          <NavLink to="/films">
+            Films
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink to="/series">
+            Séries
+          </NavLink>
+        </li>
+
       </ul>
+
       <div className="top-navbar-right">
-        {!isHome && (
-          <div className="search-section">
-            <input
-              type="text"
-              placeholder="Recherche..."
-              className="search-input"
-            />
-            <button className="search-button">Rechercher</button>
-          </div>
-        )}
-        <button className="user-icon" aria-label="Se connecter" title="Se connecter">
+
+        <button
+          type="button"
+          className="user-icon"
+          aria-label="Se connecter"
+          title="Se connecter"
+          onClick={() =>
+            navigate("/se-connecter")
+          }
+        >
           👤
         </button>
+
       </div>
+
     </div>
   );
 }
 
-// ---------------------- CAROUSEL ----------------------
+// ============================================================
+// CAROUSEL
+// ============================================================
+
 function Carousel({ movies }) {
   const [index, setIndex] = useState(0);
+
   const navigate = useNavigate();
 
-  const hasMovies = movies && movies.length > 0;
-  const current = hasMovies ? movies[Math.min(index, movies.length - 1)] : null;
+  const hasMovies =
+    Array.isArray(movies) &&
+    movies.length > 0;
 
-  // Applique la couleur/dégradé du film affiché dans le carousel au fond de toute la page
+  const current = hasMovies
+    ? movies[index]
+    : null;
+
+  // ----------------------------------------------------------
+  // PRÉCHARGEMENT DES IMAGES
+  // ----------------------------------------------------------
+
   useEffect(() => {
-    if (!current) return;
+    if (!hasMovies) {
+      return;
+    }
 
-    document.body.style.background = current.background || "#c5c4c4";
+    movies.forEach((movie) => {
+      const image = new Image();
+
+      image.src = getImagePath(
+        movie.banner || movie.poster
+      );
+    });
+  }, [movies, hasMovies]);
+
+  // ----------------------------------------------------------
+  // CHANGEMENT DU FOND
+  // ----------------------------------------------------------
+
+  useEffect(() => {
+    if (!current) {
+      return;
+    }
+
+    document.body.style.background =
+      current.background || "#c5c4c4";
 
     return () => {
       document.body.style.background = "";
     };
   }, [current]);
 
-  if (!hasMovies) return null;
+  // ----------------------------------------------------------
+  // FILM PRÉCÉDENT
+  // ----------------------------------------------------------
 
-  const prevSlide = () => {
-    setIndex((i) => (i === 0 ? movies.length - 1 : i - 1));
-  };
+  function previousSlide() {
+    setIndex((oldIndex) => {
+      if (oldIndex === 0) {
+        return movies.length - 1;
+      }
 
-  const nextSlide = () => {
-    setIndex((i) => (i === movies.length - 1 ? 0 : i + 1));
-  };
+      return oldIndex - 1;
+    });
+  }
 
-  const handleVoirPlus = () => {
+  // ----------------------------------------------------------
+  // FILM SUIVANT
+  // ----------------------------------------------------------
+
+  function nextSlide() {
+    setIndex((oldIndex) => {
+      if (oldIndex === movies.length - 1) {
+        return 0;
+      }
+
+      return oldIndex + 1;
+    });
+  }
+
+  // ----------------------------------------------------------
+  // VOIR PLUS
+  // ----------------------------------------------------------
+
+  function voirPlus() {
+    if (!current) {
+      return;
+    }
+
     navigate(`/film/${current.id}`);
-  };
+  }
+
+  // ----------------------------------------------------------
+  // AUCUN FILM
+  // ----------------------------------------------------------
+
+  if (!hasMovies || !current) {
+    return null;
+  }
+
+  // ----------------------------------------------------------
+  // AFFICHAGE
+  // ----------------------------------------------------------
 
   return (
     <div className="carousel">
+
       <div
         className="carousel-slide"
-        style={{ background: current.background || "#969696" }}
+        style={{
+          background:
+            current.background || "#969696",
+        }}
       >
-        <img src={current.banner || current.poster} alt={current.title} />
+
+        <img
+          src={getImagePath(
+            current.banner || current.poster
+          )}
+          alt={current.title}
+          draggable="false"
+        />
 
         <div className="carousel-info">
-          <h3>{current.title}</h3>
-          <p className="carousel-synopsis">{current.synopsis}</p>
+
+          <h3>
+            {current.title}
+          </h3>
+
+          <p className="carousel-synopsis">
+            {current.synopsis}
+          </p>
+
         </div>
 
-        <button className="carousel-more-button" onClick={handleVoirPlus}>
+        <button
+          type="button"
+          className="carousel-more-button"
+          onClick={voirPlus}
+        >
           Voir plus
         </button>
 
         <div className="carousel-arrows">
-          <button className="carousel-arrow" onClick={prevSlide}>‹</button>
-          <button className="carousel-arrow" onClick={nextSlide}>›</button>
+
+          <button
+            type="button"
+            className="carousel-arrow"
+            onClick={previousSlide}
+            aria-label="Film précédent"
+          >
+            ‹
+          </button>
+
+          <button
+            type="button"
+            className="carousel-arrow"
+            onClick={nextSlide}
+            aria-label="Film suivant"
+          >
+            ›
+          </button>
+
         </div>
+
       </div>
+
     </div>
   );
 }
 
-// ---------------------- ACCUEIL ----------------------
+// ============================================================
+// PAGE ACCUEIL
+// ============================================================
+
 function Accueil() {
   const navigate = useNavigate();
 
   return (
     <div className="home-main">
-      <h2 className="section-title">4 suggestions de films / séries 🎬</h2>
 
-      <Carousel movies={CAROUSEL_MOVIES} />
+      {/* ======================================================
+          CAROUSEL
+      ====================================================== */}
+
+      <h2 className="section-title">
+        4 suggestions de films / séries 🎬
+      </h2>
+
+      <Carousel
+        movies={CAROUSEL_MOVIES}
+      />
+
+      {/* ======================================================
+          DERNIERS FILMS / SÉRIES
+      ====================================================== */}
+
+      <h2 className="section-title">
+        4 derniers films / séries récemment ajoutés 🎬
+      </h2>
 
       <div className="results-section">
+
         {CARD_MOVIES.map((movie) => (
-          <div className="movie-card" key={movie.id}>
-            <img src={movie.poster} alt={movie.title} />
+
+          <div
+            className="movie-card"
+            key={movie.id}
+          >
+
+            <img
+              src={getImagePath(movie.poster)}
+              alt={movie.title}
+              draggable="false"
+            />
+
             <div className="movie-card-info">
-              <h3>{movie.title}</h3>
-              <span className="movie-card-genre">{movie.genre}</span>
+
+              <h3>
+                {movie.title}
+              </h3>
+
+              <span className="movie-card-genre">
+                {movie.genre}
+              </span>
+
               <button
+                type="button"
                 className="movie-card-view"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/film/${movie.id}`);
-                }}
+                onClick={() =>
+                  navigate(`/film/${movie.id}`)
+                }
               >
                 Voir
               </button>
+
             </div>
+
           </div>
+
         ))}
+
       </div>
+
     </div>
   );
 }
 
-// ---------------------- PAGE DÉTAIL FILM ----------------------
+// ============================================================
+// PAGE FAVORIS
+// ============================================================
+
+function Favoris() {
+  return (
+    <div className="page-simple">
+
+      <h2>
+        Page Favoris
+      </h2>
+
+    </div>
+  );
+}
+
+// ============================================================
+// PAGE NOTES
+// ============================================================
+
+function Note() {
+  return (
+    <div className="page-simple">
+
+      <h2>
+        Page Notes
+      </h2>
+
+    </div>
+  );
+}
+
+// ============================================================
+// PAGE À PROPOS
+// ============================================================
+
+function APropos() {
+  return (
+    <div className="page-simple">
+
+      <h2>
+        À propos
+      </h2>
+
+    </div>
+  );
+}
+
+// ============================================================
+// PAGE CONNEXION
+// ============================================================
+
+function Seconnecter() {
+  return (
+    <div className="page-simple">
+
+      <h2>
+        Se connecter
+      </h2>
+
+    </div>
+  );
+}
+
+// ============================================================
+// PAGE DÉTAIL
+// ============================================================
+
 function FilmDetail() {
   const { id } = useParams();
+
   const navigate = useNavigate();
+
   const movie = findMovieById(id);
 
-  // Données récupérées depuis l'API OMDb (date de sortie + synopsis)
-  const [apiData, setApiData] = useState(null);
-  const [loadingApi, setLoadingApi] = useState(false);
+  // ----------------------------------------------------------
+  // FOND DE LA PAGE
+  // ----------------------------------------------------------
 
-  // Applique le fond du film à la page détail aussi
   useEffect(() => {
-    if (!movie) return;
-    document.body.style.background = movie.background || "#c5c4c4";
+    if (!movie) {
+      return;
+    }
+
+    document.body.style.background =
+      movie.background || "#c5c4c4";
+
     return () => {
       document.body.style.background = "";
     };
   }, [movie]);
 
-  // Va chercher la date de sortie + le synopsis via l'API OMDb
-  useEffect(() => {
-    if (!movie) return;
-
-    let cancelled = false;
-    // Réinitialisation volontaire de l'état avant chaque nouvelle requête
-    // (nécessaire pour ne pas garder les données de l'ancien film pendant le chargement).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setApiData(null);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoadingApi(true);
-
-    // "movie" pour les films, "series" pour les séries
-    const type = movie.genre === "Série" ? "series" : "movie";
-
-    const searchUrl = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(
-      movie.title
-    )}&type=${type}`;
-
-    fetch(searchUrl)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`OMDb a répondu avec le statut ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (cancelled) return;
-
-        if (data.Response === "False") {
-          console.warn("OMDb :", data.Error);
-          return;
-        }
-
-        setApiData({
-          synopsis: data.Plot && data.Plot !== "N/A" ? data.Plot : null,
-          date: data.Released && data.Released !== "N/A" ? data.Released : null,
-        });
-      })
-      .catch((err) => {
-        console.warn("Erreur API OMDb :", err.message || err);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingApi(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [movie]);
+  // ----------------------------------------------------------
+  // FILM INTROUVABLE
+  // ----------------------------------------------------------
 
   if (!movie) {
     return (
       <div className="film-detail">
-        <p>Film introuvable.</p>
-        <button className="back-button" onClick={() => navigate('/')}>
+
+        <h2>
+          Film ou série introuvable
+        </h2>
+
+        <button
+          type="button"
+          className="back-button"
+          onClick={() => navigate("/")}
+        >
           ← Retour à l'accueil
         </button>
+
       </div>
     );
   }
 
-  // Priorité aux données de l'API si disponibles, sinon on garde les données locales
-  const displaySynopsis = apiData?.synopsis || movie.synopsis;
-  const displayDate = apiData?.date
-    ? new Date(apiData.date).toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : null;
+  // ----------------------------------------------------------
+  // PAGE DETAILS
+  // ----------------------------------------------------------
 
   return (
-    <div className="film-detail">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        ← Retour
-      </button>
-
-      <div className="film-detail-header">
-        <img
-          className="film-detail-poster"
-          src={movie.poster}
-          alt={movie.title}
-        />
-        <div className="film-detail-info">
-          <h1>{movie.title}</h1>
-          <span className="film-detail-genre">{movie.genre}</span>
-          {loadingApi && (
-            <span className="film-detail-loading">Chargement des informations…</span>
-          )}
-          {displayDate && (
-            <span className="film-detail-date">Sortie le {displayDate}</span>
-          )}
-          <p className="film-detail-synopsis">{displaySynopsis}</p>
-        </div>
-      </div>
-
-      {movie.trailer && (
-        <div className="film-detail-trailer">
-          <h2>Bande-annonce</h2>
-          <div className="trailer-wrapper">
-            <iframe
-              src={movie.trailer}
-              title={`Trailer de ${movie.title}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
-      )}
-    </div>
+    <Details movie={movie} />
   );
 }
 
-// ---------------------- AUTRES PAGES ----------------------
-function Films() {
-  return <h2>Page Films</h2>;
-}
+// ============================================================
+// APPLICATION
+// ============================================================
 
-function Series() {
-  return <h2>Page Séries</h2>;
-}
-
-function Favoris() {
-  return <h2>Page Favoris</h2>;
-}
-
-function Note() {
-  return <h2>Page Notes</h2>;
-}
-
-function APropos() {
-  return <h2>Page À propos</h2>;
-}
-
-// ---------------------- APP ----------------------
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={BASE_URL}>
+
+      {/* Redirection après actualisation */}
+
+      <ReloadToHome />
+
       <div className="app">
+
+        {/* SIDEBAR */}
+
         <Sidebar />
 
         <div className="app-content">
+
+          {/* BARRE DU HAUT */}
+
           <TopNavbar />
 
           <main className="page-content">
+
             <Routes>
-              <Route path="/" element={<Accueil />} />
-              <Route path="/films" element={<Films />} />
-              <Route path="/series" element={<Series />} />
-              <Route path="/favoris" element={<Favoris />} />
-              <Route path="/note" element={<Note />} />
-              <Route path="/apropos" element={<APropos />} />
-              <Route path="/film/:id" element={<FilmDetail />} />
+
+              {/* ==================================================
+                  ACCUEIL
+              ================================================== */}
+
+              <Route
+                path="/"
+                element={<Accueil />}
+              />
+
+              {/* ==================================================
+                  FILMS
+              ================================================== */}
+
+              <Route
+                path="/films"
+                element={<Films />}
+              />
+
+              {/* ==================================================
+                  SÉRIES
+              ================================================== */}
+
+              <Route
+                path="/series"
+                element={<Series />}
+              />
+
+              {/* ==================================================
+                  FAVORIS
+              ================================================== */}
+
+              <Route
+                path="/favoris"
+                element={<Favoris />}
+              />
+
+              {/* ==================================================
+                  NOTES
+              ================================================== */}
+
+              <Route
+                path="/note"
+                element={<Note />}
+              />
+
+              {/* ==================================================
+                  À PROPOS
+              ================================================== */}
+
+              <Route
+                path="/apropos"
+                element={<APropos />}
+              />
+
+              {/* ==================================================
+                  CONNEXION
+              ================================================== */}
+
+              <Route
+                path="/se-connecter"
+                element={<Seconnecter />}
+              />
+
+              {/* ==================================================
+                  DÉTAIL D'UN FILM OU D'UNE SÉRIE
+              ================================================== */}
+
+              <Route
+                path="/film/:id"
+                element={<FilmDetail />}
+              />
+
             </Routes>
+
           </main>
+
         </div>
+
       </div>
+
     </BrowserRouter>
   );
 }
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 export default App;

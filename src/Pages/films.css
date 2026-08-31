@@ -1,4 +1,255 @@
+/* ============================================================
+   PAGE FILMS
+============================================================ */
+
 .films-page {
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   TITRE
+============================================================ */
+
+.films-header {
+  margin-bottom: 2rem;
+}
+
+.films-header h1 {
   color: white;
-  padding: 1rem 0;
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+}
+
+.films-header p {
+  color: #bdbdbd;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ============================================================
+   FILTRES
+============================================================ */
+
+.films-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.films-search {
+  flex: 1;
+  min-width: 250px;
+}
+
+.films-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.films-search input::placeholder {
+  color: #aaa;
+}
+
+.films-search input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
+   FILTRE GENRE
+============================================================ */
+
+.films-genre {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.films-genre label {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.films-genre select {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #222;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.films-genre select:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
+   NOMBRE DE RÉSULTATS
+============================================================ */
+
+.films-count {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
+}
+
+/* ============================================================
+   GRILLE
+============================================================ */
+
+.films-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* ============================================================
+   CARTE
+============================================================ */
+
+.film-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.film-card:hover {
+  transform: translateY(-7px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   IMAGE
+============================================================ */
+
+.film-card img {
+  width: 100%;
+  height: 310px;
+  object-fit: cover;
+  display: block;
+  background: #333;
+}
+
+/* ============================================================
+   INFORMATIONS
+============================================================ */
+
+.film-card-info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.film-card-info h2 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.film-card-info span {
+  display: block;
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ============================================================
+   BOUTON VOIR
+============================================================ */
+
+.film-card-info button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 1.4rem;
+  background: white;
+  color: #1c1c1c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.film-card-info button:hover {
+  background: #ddd;
+  transform: scale(1.05);
+}
+
+/* ============================================================
+   AUCUN RÉSULTAT
+============================================================ */
+
+.no-results {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.no-results h2 {
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.no-results p {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .films-page {
+    padding: 1rem;
+  }
+
+  .films-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .films-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .films-search {
+    width: 100%;
+  }
+
+  .films-genre {
+    justify-content: space-between;
+  }
+
+  .films-grid {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(150px, 1fr)
+    );
+    gap: 1rem;
+  }
+
+  .film-card img {
+    height: 240px;
+  }
+
 }

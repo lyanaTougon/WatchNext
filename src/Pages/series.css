@@ -1,4 +1,333 @@
+/* ============================================================
+   PAGE SÉRIES
+   ============================================================ */
+
 .series-page {
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   EN-TÊTE
+   ============================================================ */
+
+.series-header {
+  margin-bottom: 2rem;
+}
+
+.series-header h1 {
   color: white;
-  padding: 1rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.series-header p {
+  color: #b5b5b5;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ============================================================
+   FILTRES
+   ============================================================ */
+
+.series-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================================
+   RECHERCHE
+   ============================================================ */
+
+.series-search {
+  flex: 1;
+}
+
+.series-search input {
+  width: 100%;
+  height: 45px;
+  padding: 0 1rem;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+
+  font-size: 0.9rem;
+  outline: none;
+
+  transition: border 0.2s ease,
+              background 0.2s ease;
+}
+
+.series-search input::placeholder {
+  color: #999;
+}
+
+.series-search input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================================
+   FILTRE GENRE
+   ============================================================ */
+
+.series-genre {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.series-genre label {
+  color: white;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.series-genre select {
+  height: 45px;
+  padding: 0 1rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+
+  background: #222;
+  color: white;
+
+  font-size: 0.9rem;
+  outline: none;
+
+  cursor: pointer;
+}
+
+.series-genre select:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
+   NOMBRE DE RÉSULTATS
+   ============================================================ */
+
+.series-count {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ============================================================
+   GRILLE
+   ============================================================ */
+
+.series-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(200px, 1fr));
+
+  gap: 1.5rem;
+
+  width: 100%;
+}
+
+/* ============================================================
+   CARTE
+   ============================================================ */
+
+.series-card {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.series-card:hover {
+  transform: translateY(-7px);
+
+  background: rgba(255, 255, 255, 0.1);
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   IMAGE
+   ============================================================ */
+
+.series-card img {
+  width: 100%;
+  height: 300px;
+
+  object-fit: cover;
+
+  display: block;
+
+  background: #444;
+}
+
+/* ============================================================
+   INFORMATIONS
+   ============================================================ */
+
+.series-card-info {
+  padding: 0.9rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 0.45rem;
+}
+
+.series-card-info h2 {
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  text-align: center;
+
+  margin: 0;
+
+  line-height: 1.3;
+}
+
+.series-card-info span {
+  color: #aaa;
+
+  font-size: 0.8rem;
+
+  text-align: center;
+}
+
+/* ============================================================
+   BOUTON VOIR
+   ============================================================ */
+
+.series-card-info button {
+  margin-top: 0.45rem;
+
+  border: none;
+
+  border-radius: 999px;
+
+  padding: 0.45rem 1.4rem;
+
+  background: white;
+  color: #1c1c1c;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.series-card-info button:hover {
+  background: #ddd;
+
+  transform: scale(1.05);
+}
+
+/* ============================================================
+   AUCUN RÉSULTAT
+   ============================================================ */
+
+.series-no-results {
+  width: 100%;
+
+  padding: 4rem 1rem;
+
+  text-align: center;
+}
+
+.series-no-results h2 {
+  color: white;
+
+  font-size: 1.4rem;
+
+  margin-bottom: 0.5rem;
+}
+
+.series-no-results p {
+  color: #999;
+
+  font-size: 0.9rem;
+
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .series-page {
+    padding: 1rem;
+  }
+
+  .series-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .series-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .series-search {
+    width: 100%;
+  }
+
+  .series-genre {
+    justify-content: space-between;
+  }
+
+  .series-genre select {
+    flex: 1;
+  }
+
+  .series-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 1rem;
+  }
+
+  .series-card img {
+    height: 250px;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .series-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .series-card img {
+    height: 350px;
+  }
 }
