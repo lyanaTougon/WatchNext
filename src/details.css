@@ -1,0 +1,123 @@
+/* ---------------- PAGE DÉTAIL FILM ---------------- */
+
+.film-detail {
+  padding: 1.5rem 0 3rem;
+  max-width: 1000px;
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 999px;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2rem;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.film-detail-header {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+}
+
+.film-detail-poster {
+  width: 260px;
+  height: 380px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.film-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.film-detail-info h1 {
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.film-detail-genre {
+  display: inline-block;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  width: fit-content;
+}
+
+.film-detail-date {
+  color: #cdcdcd;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.film-detail-loading {
+  color: #999;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.film-detail-synopsis {
+  color: #e6e6e6;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0.5rem 0 0;
+}
+
+.film-detail-trailer h2 {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.trailer-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.trailer-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media (max-width: 640px) {
+  .film-detail-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .film-detail-info {
+    align-items: center;
+  }
+}

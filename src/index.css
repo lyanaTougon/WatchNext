@@ -1,70 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
 body {
-  background: #555555;
+  background: #c5c4c4;
+  transition: background 0.8s ease;
 }
 
-.navbar {
+/* ---------------- LAYOUT GLOBAL ---------------- */
+
+.app {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: rgba(12, 12, 12, 0.221);
+  min-height: 100vh;
+  background: transparent;
 }
 
-.navbar-left {
+.app-content {
+  flex: 1;
+  margin-left: 220px; /* même largeur que .sidebar */
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  flex-direction: column;
 }
 
-.navbar-logo {
-  font-weight: bold;
+.page-content {
+  flex: 1;
+  padding: 0 2rem 1.5rem;
+}
+
+/* ---------------- SIDEBAR VERTICALE (GAUCHE) ---------------- */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background: #14141428;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  font-size: 1.3rem;
+  font-weight: 700;
   color: white;
-  white-space: nowrap;
+  margin-bottom: 2.5rem;
 }
 
-.navbar-links {
+.sidebar-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.navbar-links a {
-  color: white;
+.sidebar-links li a {
+  display: block;
+  color: #cdcdcd;
   text-decoration: none;
+  font-size: 0.95rem;
   font-weight: 500;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-links li a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.sidebar-links li a.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* ---------------- TOP NAVBAR (FILMS / SÉRIES) ---------------- */
+
+.top-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  padding: 0.4rem 1.1rem;
+  background: rgba(33, 33, 33, 0.237);
   border-radius: 999px;
-  transition: background 0.25s ease, color 0.25s ease;
+  margin: 1.5rem 2rem 0;
 }
 
-.navbar-links a:hover {
-  background: rgba(216, 216, 218, 0.134);
-  color: #f9f9fa;
+.top-navbar-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.5rem;
 }
 
-.navbar-links a.active {
-  background: rgba(199, 198, 199, 0.232);
-  color: #ebebec;
+.top-navbar-links li a {
+  color: #f0f0f0;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.top-navbar-links li a:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.top-navbar-links li a.active {
+  color: white;
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.top-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 .search-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
   background: transparent;
 }
 
 .search-input {
   background: transparent;
-  border: 1px solid #e1e1e0;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
   color: white;
   outline: none;
-  min-width: 180px;
+  font-size: 0.78rem;
+  min-width: 150px;
 }
 
 .search-input::placeholder {
-  color: #ccc;
+  color: #999;
 }
 
 .search-input:focus {
@@ -72,157 +168,41 @@ body {
 }
 
 .search-button {
-  background: transparent;
-  border: 1px solid #cdcdcd;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  color: #dddcdb;
+  background: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  color: #1c1c1c;
+  font-weight: 600;
+  font-size: 0.78rem;
   cursor: pointer;
-  font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .search-button:hover {
-  background: #fefefe;
-  color: #1c1c1c;
+  background: #dddcdb;
 }
 
-/* ---------------- LAYOUT 2 COLONNES ---------------- */
-
-.home-layout {
-  display: flex;
-  gap: 1.5rem;
-  width: 100%;
-  align-items: flex-start;
-  padding: 0 1rem;
-}
-
-.home-main {
-  flex: 1;
-  min-width: 0;
-}
-
-.home-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  padding: 1.5rem 0;
-  
-}
-
-.home-sidebar h2 {
-  color: white;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-}
-
-.sidebar-movie {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.sidebar-movie:hover {
-  transform: translateX(4px);
-}
-
-.sidebar-movie img {
-  width: 60px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 6px;
-  background: #444;
-  flex-shrink: 0;
-}
-
-.sidebar-movie-info h4 {
-  color: white;
-  font-size: 0.9rem;
-  margin: 0 0 0.25rem;
-}
-
-.sidebar-movie-info p {
-  color: #aaa;
-  font-size: 0.75rem;
-  margin: 0;
-}
-
-.results-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  padding: 1.5rem 0;
-  width: 100%;
-}
-
-/* ---------------- MOVIE CARD ---------------- */
-
-.movie-card {
-  position: relative;
-  background: #1a1a1a;
-  border-radius: 14px;
-  overflow: hidden;
-  width: 240px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  cursor: pointer;
-}
-
-.movie-card:hover {
-  transform: translateY(-8px) scale(1.04);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.75);
-}
-
-.movie-card img {
-  width: 100%;
-  height: 340px;
-  object-fit: cover;
-  background: #444;
-  display: block;
-}
-
-.movie-card h3 {
-  color: white;
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 1rem 0.75rem;
-  background: linear-gradient(180deg, #1a1a1a 0%, #242424 100%);
-}
-
-.movie-card-add {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 38px;
-  height: 38px;
+.user-icon {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid #cdcdcd;
   color: white;
-  font-size: 1.4rem;
-  line-height: 1;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 2;
-  opacity: 0;
-  transform: scale(0.85);
 }
 
-.movie-card:hover .movie-card-add {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.movie-card-add:hover {
-  background: #ffffff;
+.user-icon:hover {
+  background: white;
   color: #1c1c1c;
-  transform: scale(1.15);
+  transform: scale(1.08);
 }
 
 /* ---------------- CAROUSEL ---------------- */
@@ -231,13 +211,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem auto;
+  margin: 0.5rem auto 2rem;
   width: 100%;
   max-width: 100%;
   padding: 0;
 }
 
 .carousel-slide {
+  transition: background 0.6s ease;
   position: relative;
   width: 100%;
   height: 75vh;
@@ -259,18 +240,31 @@ body {
   transition: none;
 }
 
-.carousel-slide h3 {
+.carousel-info {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 2rem 2rem 5rem;
+  pointer-events: none;
+  max-width: 55%;
+}
+
+.carousel-slide h3 {
   color: white;
   font-size: 1.6rem;
   font-weight: 700;
-  padding: 2rem 2rem 5rem;
-  margin: 0;
-  pointer-events: none;
+  margin: 0 0 0.6rem;
   transition: none;
+}
+
+.carousel-synopsis {
+  color: #e6e6e6;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .carousel-more-button {
@@ -327,4 +321,120 @@ body {
   background: #fefefe;
   color: #1c1c1c;
   transform: scale(1.08);
+}
+
+.section-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+}
+
+/* ---------------- RESULTS / MOVIE CARDS ---------------- */
+
+.results-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.movie-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  width: 240px;
+  text-align: center;
+  transition: transform 0.25s ease, background 0.25s ease;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: translateY(-8px) scale(1.04);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.movie-card img {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  background: #444;
+  display: block;
+  border-radius: 14px;
+}
+
+.movie-card-info {
+  padding: 0.85rem 0.5rem 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.movie-card-info h3 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.movie-card-genre {
+  color: #b5b5b5;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.movie-card-view {
+  margin-top: 0.4rem;
+  background: white;
+  color: #1c1c1c;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.movie-card-view:hover {
+  background: #dddcdb;
+  transform: scale(1.05);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar-logo {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .sidebar-links li a {
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .app-content {
+    margin-left: 70px;
+  }
+
+  .top-navbar {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .search-section {
+    margin-left: 0;
+    width: 100%;
+  }
 }
