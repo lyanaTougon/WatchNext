@@ -18,7 +18,7 @@ function getImagePath(path) {
     return "";
   }
 
-  // Si l'image vient d'un site externe
+  // Image provenant d'un site externe
   if (
     path.startsWith("http://") ||
     path.startsWith("https://")
@@ -26,10 +26,10 @@ function getImagePath(path) {
     return path;
   }
 
-  // Image située dans /public/images/
+  // Image située dans public/images/
+  // Compatible avec GitHub Pages
   return `${BASE_URL}${path.replace(/^\/+/, "")}`;
 }
-
 // ============================================================
 // PAGE SÉRIES
 // ============================================================

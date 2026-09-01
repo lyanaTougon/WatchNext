@@ -14,6 +14,7 @@ function getImagePath(path) {
     return "";
   }
 
+  // Si l'image vient d'un site externe
   if (
     path.startsWith("http://") ||
     path.startsWith("https://")
@@ -21,6 +22,8 @@ function getImagePath(path) {
     return path;
   }
 
+  // Image située dans public/images/
+  // Fonctionne avec GitHub Pages (/projet-films/)
   return `${BASE_URL}${path.replace(/^\/+/, "")}`;
 }
 
