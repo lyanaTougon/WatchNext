@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { findMovieById } from "./Data/movie.jsx";
+import "./details.css";
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -9,10 +10,7 @@ function getImagePath(path) {
     return "";
   }
 
-  if (
-    path.startsWith("http://") ||
-    path.startsWith("https://")
-  ) {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
 
@@ -22,36 +20,45 @@ function getImagePath(path) {
 function Details() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const movie = findMovieById(id);
 
-  // ========================================
+  // ============================================================
   // ÉTATS
-  // ========================================
+  // ============================================================
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [userRating, setUserRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
+
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [loadingRating, setLoadingRating] = useState(false);
-  const [message, setMessage] = useState("");
 
-  // ========================================
+  // Message FAVORIS
+  const [favoriteMessage, setFavoriteMessage] = useState("");
+  const [favoriteMessageType, setFavoriteMessageType] = useState("");
+
+  // Message NOTE
+  const [ratingMessage, setRatingMessage] = useState("");
+  const [ratingMessageType, setRatingMessageType] = useState("");
+
+  // ============================================================
   // BACKEND
-  // ========================================
+  // ============================================================
 
   const API_URL = "http://localhost:5000";
 
-  // ========================================
-  // RÉCUPÉRER LE TOKEN
-  // ========================================
+  // ============================================================
+  // TOKEN
+  // ============================================================
 
   const getToken = () => {
     return localStorage.getItem("token");
   };
 
-  // ========================================
-  // VÉRIFIER SI LE FILM EST EN FAVORI
-  // ========================================
+  // ============================================================
+  // RÉCUPÉRER LES FAVORIS
+  // ============================================================
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -62,14 +69,12 @@ function Details() {
       }
 
       try {
-        const response = await fetch(
-          `${API_URL}/api/favoris`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/api/favoris`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           return;
@@ -84,19 +89,16 @@ function Details() {
 
         setIsFavorite(favoriteExists);
       } catch (error) {
-        console.error(
-          "Erreur récupération favoris :",
-          error
-        );
+        console.error("Erreur récupération favoris :", error);
       }
     };
 
     checkFavorite();
   }, [movie]);
 
-  // ========================================
-  // RÉCUPÉRER LA NOTE DE L'UTILISATEUR
-  // ========================================
+  // ============================================================
+  // RÉCUPÉRER LA NOTE
+  // ============================================================
 
   useEffect(() => {
     const getUserRating = async () => {
@@ -107,14 +109,12 @@ function Details() {
       }
 
       try {
-        const response = await fetch(
-          `${API_URL}/api/ratings`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/api/ratings`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           return;
@@ -131,25 +131,42 @@ function Details() {
           setUserRating(Number(ratingExists.rating));
         }
       } catch (error) {
-        console.error(
-          "Erreur récupération note :",
-          error
-        );
+        console.error("Erreur récupération note :", error);
       }
     };
 
     getUserRating();
   }, [movie]);
 
-  // ========================================
-  // AJOUTER / SUPPRIMER UN FAVORI
-  // ========================================
+  // ============================================================
+  // ALLER À LA CONNEXION
+  // ============================================================
+
+  const goToLogin = () => {
+    navigate("/se-connecter");
+  };
+
+  // ============================================================
+  // FAVORIS
+  // ============================================================
 
   const toggleFavorite = async () => {
     const token = getToken();
 
+    // ----------------------------------------------------------
+    // PAS CONNECTÉ
+    // ----------------------------------------------------------
+
     if (!token) {
-      navigate("/se-connecter");
+      setFavoriteMessage(
+        "Veuillez vous connecter pour ajouter ce film à vos favoris."
+      );
+
+      setFavoriteMessageType("login");
+
+      setRatingMessage("");
+      setRatingMessageType("");
+
       return;
     }
 
@@ -158,11 +175,16 @@ function Details() {
     }
 
     setLoadingFavorite(true);
-    setMessage("");
+
+    setFavoriteMessage("");
+    setFavoriteMessageType("");
 
     try {
+      // --------------------------------------------------------
+      // RETIRER DES FAVORIS
+      // --------------------------------------------------------
+
       if (isFavorite) {
-        // SUPPRESSION
         const response = await fetch(
           `${API_URL}/api/favoris/${movie.id}`,
           {
@@ -176,16 +198,29 @@ function Details() {
         const data = await response.json();
 
         if (!response.ok) {
-          setMessage(
+          setFavoriteMessage(
             data.message || "Erreur lors de la suppression."
           );
+
+          setFavoriteMessageType("error");
+
           return;
         }
 
         setIsFavorite(false);
-        setMessage("Film retiré des favoris ❤️");
-      } else {
-        // AJOUT
+
+        setFavoriteMessage(
+          "Film retiré des favoris ❤️"
+        );
+
+        setFavoriteMessageType("success");
+      }
+
+      // --------------------------------------------------------
+      // AJOUTER AUX FAVORIS
+      // --------------------------------------------------------
+
+      else {
         const response = await fetch(
           `${API_URL}/api/favoris`,
           {
@@ -203,38 +238,57 @@ function Details() {
         const data = await response.json();
 
         if (!response.ok) {
-          setMessage(
+          setFavoriteMessage(
             data.message || "Erreur lors de l'ajout."
           );
+
+          setFavoriteMessageType("error");
+
           return;
         }
 
         setIsFavorite(true);
-        setMessage("Film ajouté aux favoris ❤️");
+
+        setFavoriteMessage(
+          "Film ajouté aux favoris ❤️"
+        );
+
+        setFavoriteMessageType("success");
       }
     } catch (error) {
-      console.error(
-        "Erreur favori :",
-        error
-      );
+      console.error("Erreur favori :", error);
 
-      setMessage(
+      setFavoriteMessage(
         "Impossible de contacter le serveur."
       );
+
+      setFavoriteMessageType("error");
     } finally {
       setLoadingFavorite(false);
     }
   };
 
-  // ========================================
-  // AJOUTER / MODIFIER UNE NOTE
-  // ========================================
+  // ============================================================
+  // NOTES
+  // ============================================================
 
   const handleRating = async (rating) => {
     const token = getToken();
 
+    // ----------------------------------------------------------
+    // PAS CONNECTÉ
+    // ----------------------------------------------------------
+
     if (!token) {
-      navigate("/se-connecter");
+      setRatingMessage(
+        "Veuillez vous connecter pour noter ce film."
+      );
+
+      setRatingMessageType("login");
+
+      setFavoriteMessage("");
+      setFavoriteMessageType("");
+
       return;
     }
 
@@ -243,7 +297,9 @@ function Details() {
     }
 
     setLoadingRating(true);
-    setMessage("");
+
+    setRatingMessage("");
+    setRatingMessageType("");
 
     try {
       const response = await fetch(
@@ -264,32 +320,117 @@ function Details() {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(
-          data.message || "Erreur lors de l'enregistrement."
+        setRatingMessage(
+          data.message ||
+            "Erreur lors de l'enregistrement."
         );
+
+        setRatingMessageType("error");
+
         return;
       }
 
       setUserRating(Number(rating));
-      setMessage("Note enregistrée ⭐");
-    } catch (error) {
-      console.error(
-        "Erreur note :",
-        error
+
+      setRatingMessage(
+        "Note enregistrée ⭐"
       );
 
-      setMessage(
+      setRatingMessageType("success");
+    } catch (error) {
+      console.error("Erreur note :", error);
+
+      setRatingMessage(
         "Impossible de contacter le serveur."
       );
+
+      setRatingMessageType("error");
     } finally {
       setLoadingRating(false);
       setHoverRating(0);
     }
   };
 
-  // ========================================
+  // ============================================================
+  // SUPPRIMER LA NOTE
+  // ============================================================
+
+  const deleteRating = async () => {
+    const token = getToken();
+
+    if (!token || !movie) {
+      return;
+    }
+
+    setLoadingRating(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/ratings/${movie.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRatingMessage(
+          data.message ||
+            "Erreur lors de la suppression."
+        );
+
+        setRatingMessageType("error");
+
+        return;
+      }
+
+      setUserRating(null);
+
+      setRatingMessage(
+        "Note supprimée."
+      );
+
+      setRatingMessageType("success");
+    } catch (error) {
+      console.error("Erreur suppression note :", error);
+
+      setRatingMessage(
+        "Impossible de contacter le serveur."
+      );
+
+      setRatingMessageType("error");
+    } finally {
+      setLoadingRating(false);
+      setHoverRating(0);
+    }
+  };
+
+  // ============================================================
+  // CALCUL DE LA NOTE AU SURVOL
+  // ============================================================
+
+  const getRatingFromMouse = (event, star) => {
+    const rect =
+      event.currentTarget.getBoundingClientRect();
+
+    const mousePosition =
+      event.clientX - rect.left;
+
+    const isLeftHalf =
+      mousePosition < rect.width / 2;
+
+    return isLeftHalf
+      ? star - 0.5
+      : star;
+  };
+
+  // ============================================================
   // ARRIÈRE-PLAN
-  // ========================================
+  // ============================================================
 
   useEffect(() => {
     if (!movie) {
@@ -304,9 +445,9 @@ function Details() {
     };
   }, [movie]);
 
-  // ========================================
+  // ============================================================
   // FILM INTROUVABLE
-  // ========================================
+  // ============================================================
 
   if (!movie) {
     return (
@@ -314,6 +455,7 @@ function Details() {
         <h2>Film introuvable</h2>
 
         <button
+          type="button"
           className="back-button"
           onClick={() => navigate("/")}
         >
@@ -323,26 +465,34 @@ function Details() {
     );
   }
 
-  // ========================================
+  // ============================================================
   // AFFICHAGE
-  // ========================================
+  // ============================================================
 
   return (
     <div className="film-detail">
 
-      {/* RETOUR */}
+      {/* ======================================================
+          RETOUR
+      ====================================================== */}
 
       <button
+        type="button"
         className="back-button"
         onClick={() => navigate(-1)}
       >
         ← Retour
       </button>
 
-
-      {/* INFORMATIONS DU FILM */}
+      {/* ======================================================
+          INFORMATIONS DU FILM
+      ====================================================== */}
 
       <div className="film-detail-header">
+
+        {/* ====================================================
+            AFFICHE
+        ==================================================== */}
 
         <img
           className="film-detail-poster"
@@ -352,24 +502,38 @@ function Details() {
 
         <div className="film-detail-info">
 
+          {/* ==================================================
+              TITRE
+          ================================================== */}
+
           <h1>{movie.title}</h1>
+
+          {/* ==================================================
+              GENRE
+          ================================================== */}
 
           <span className="film-detail-genre">
             {movie.genre}
           </span>
 
+          {/* ==================================================
+              SYNOPSIS
+          ================================================== */}
+
           <p className="film-detail-synopsis">
             {movie.synopsis}
           </p>
 
-
-          {/* ========================================
+          {/* ==================================================
               FAVORIS
-          ======================================== */}
+          ================================================== */}
 
           <button
+            type="button"
             className={`favorite-button ${
-              isFavorite ? "favorite-active" : ""
+              isFavorite
+                ? "favorite-active"
+                : ""
             }`}
             onClick={toggleFavorite}
             disabled={loadingFavorite}
@@ -381,38 +545,86 @@ function Details() {
               : "♡ Ajouter aux favoris"}
           </button>
 
+          {/* ==================================================
+              MESSAGE FAVORIS
+          ================================================== */}
 
-          {/* ========================================
+          {favoriteMessage && (
+            <div
+              className={`action-message ${favoriteMessageType}`}
+            >
+              <p>{favoriteMessage}</p>
+
+              {favoriteMessageType === "login" && (
+                <button
+                  type="button"
+                  className="message-login-button"
+                  onClick={goToLogin}
+                >
+                  Se connecter
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* ==================================================
               NOTES
-          ======================================== */}
+          ================================================== */}
 
           <div className="rating-section">
 
             <h3>Ma note</h3>
+
+            {/* =================================================
+                ÉTOILES
+            ================================================= */}
 
             <div className="stars">
 
               {[1, 2, 3, 4, 5].map((star) => {
 
                 const currentRating =
-                  hoverRating || userRating || 0;
+                  hoverRating !== 0
+                    ? hoverRating
+                    : userRating || 0;
+
+                let starClass = "";
+
+                if (currentRating >= star) {
+                  starClass = "active";
+                } else if (
+                  currentRating >= star - 0.5
+                ) {
+                  starClass = "half";
+                }
 
                 return (
                   <button
                     key={star}
-                    className={
-                      star <= currentRating
-                        ? "star active"
-                        : "star"
-                    }
-                    onClick={() => handleRating(star)}
-                    onMouseEnter={() =>
-                      setHoverRating(star)
-                    }
-                    onMouseLeave={() =>
-                      setHoverRating(0)
-                    }
+                    type="button"
+                    className={`star ${starClass}`}
                     disabled={loadingRating}
+                    onMouseMove={(event) => {
+                      const rating =
+                        getRatingFromMouse(
+                          event,
+                          star
+                        );
+
+                      setHoverRating(rating);
+                    }}
+                    onMouseLeave={() => {
+                      setHoverRating(0);
+                    }}
+                    onClick={(event) => {
+                      const rating =
+                        getRatingFromMouse(
+                          event,
+                          star
+                        );
+
+                      handleRating(rating);
+                    }}
                     aria-label={`Noter ${star} sur 5`}
                   >
                     ★
@@ -420,30 +632,64 @@ function Details() {
                 );
               })}
 
+              {/* =================================================
+                  SUPPRIMER LA NOTE
+              ================================================= */}
+
+              {userRating !== null && (
+                <button
+                  type="button"
+                  className="clear-rating"
+                  onClick={deleteRating}
+                  disabled={loadingRating}
+                  title="Supprimer ma note"
+                  aria-label="Supprimer ma note"
+                >
+                  ×
+                </button>
+              )}
+
             </div>
 
-            {userRating && (
+            {/* ==================================================
+                NOTE ACTUELLE
+            ================================================== */}
+
+            {userRating !== null && (
               <p className="rating-text">
                 Ma note : {userRating}/5 ⭐
               </p>
             )}
 
+            {/* ==================================================
+                MESSAGE NOTE
+            ================================================== */}
+
+            {ratingMessage && (
+              <div
+                className={`action-message ${ratingMessageType}`}
+              >
+                <p>{ratingMessage}</p>
+
+                {ratingMessageType === "login" && (
+                  <button
+                    type="button"
+                    className="message-login-button"
+                    onClick={goToLogin}
+                  >
+                    Se connecter
+                  </button>
+                )}
+              </div>
+            )}
+
           </div>
-
-
-          {/* MESSAGE */}
-
-          {message && (
-            <p className="action-message">
-              {message}
-            </p>
-          )}
-
         </div>
       </div>
 
-
-      {/* BANDE-ANNONCE */}
+      {/* ======================================================
+          BANDE-ANNONCE
+      ====================================================== */}
 
       {movie.trailer && (
         <div className="film-detail-trailer">
@@ -461,7 +707,6 @@ function Details() {
             />
 
           </div>
-
         </div>
       )}
 

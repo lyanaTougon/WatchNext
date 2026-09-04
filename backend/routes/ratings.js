@@ -4,6 +4,7 @@ import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
+
 // ========================================
 // AJOUTER OU MODIFIER UNE NOTE
 // ========================================
@@ -20,28 +21,41 @@ router.post("/", authMiddleware, async (req, res) => {
       });
     }
 
-    // Vérification de la note
-    if (rating < 0.5 || rating > 5) {
+    const note = Number(rating);
+
+    // Notes autorisées :
+    // 0 / 0.5 / 1 / 1.5 / 2 / 2.5 / 3 / 3.5 / 4 / 4.5 / 5
+    if (
+      Number.isNaN(note) ||
+      note < 0 ||
+      note > 5 ||
+      note % 0.5 !== 0
+    ) {
       return res.status(400).json({
-        message: "La note doit être comprise entre 0.5 et 5."
+        message:
+          "La note doit être comprise entre 0 et 5, par pas de 0.5."
       });
     }
 
-    // Vérifier si une note existe déjà
+    // Vérifier si l'utilisateur a déjà noté ce film
     const existingRating = await pool.query(
-      `SELECT * FROM ratings
+      `SELECT *
+       FROM ratings
        WHERE user_id = $1 AND movie_id = $2`,
       [user_id, movie_id]
     );
 
-    // Si une note existe → modification
+    // ========================================
+    // MODIFIER UNE NOTE EXISTANTE
+    // ========================================
+
     if (existingRating.rows.length > 0) {
       const result = await pool.query(
         `UPDATE ratings
          SET rating = $1
          WHERE user_id = $2 AND movie_id = $3
          RETURNING *`,
-        [rating, user_id, movie_id]
+        [note, user_id, movie_id]
       );
 
       return res.json({
@@ -50,12 +64,15 @@ router.post("/", authMiddleware, async (req, res) => {
       });
     }
 
-    // Sinon → nouvelle note
+    // ========================================
+    // AJOUTER UNE NOUVELLE NOTE
+    // ========================================
+
     const result = await pool.query(
       `INSERT INTO ratings (user_id, movie_id, rating)
        VALUES ($1, $2, $3)
        RETURNING *`,
-      [user_id, movie_id, rating]
+      [user_id, movie_id, note]
     );
 
     res.status(201).json({
@@ -82,7 +99,8 @@ router.get("/", authMiddleware, async (req, res) => {
     const user_id = req.user.id;
 
     const result = await pool.query(
-      `SELECT * FROM ratings
+      `SELECT *
+       FROM ratings
        WHERE user_id = $1
        ORDER BY created_at DESC`,
       [user_id]
@@ -94,6 +112,72 @@ router.get("/", authMiddleware, async (req, res) => {
 
   } catch (error) {
     console.error("Erreur récupération notes :", error);
+
+    res.status(500).json({
+      message: "Erreur serveur."
+    });
+  }
+});
+
+
+// ========================================
+// RÉCUPÉRER LA MOYENNE D'UN FILM
+// ========================================
+
+router.get("/movie/:movie_id", async (req, res) => {
+  try {
+    const { movie_id } = req.params;
+
+    const result = await pool.query(
+      `SELECT
+         COALESCE(AVG(rating), 0) AS average_rating,
+         COUNT(*) AS rating_count
+       FROM ratings
+       WHERE movie_id = $1`,
+      [movie_id]
+    );
+
+    const average = Number(result.rows[0].average_rating);
+
+    res.json({
+      movie_id: movie_id,
+      average_rating: Number(average.toFixed(1)),
+      rating_count: Number(result.rows[0].rating_count)
+    });
+
+  } catch (error) {
+    console.error("Erreur moyenne du film :", error);
+
+    res.status(500).json({
+      message: "Erreur serveur."
+    });
+  }
+});
+
+
+// ========================================
+// TOP 5 DES FILMS LES MIEUX NOTÉS
+// ========================================
+
+router.get("/top5", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         movie_id,
+         ROUND(AVG(rating)::numeric, 1) AS average_rating,
+         COUNT(*) AS rating_count
+       FROM ratings
+       GROUP BY movie_id
+       ORDER BY AVG(rating) DESC, COUNT(*) DESC
+       LIMIT 5`
+    );
+
+    res.json({
+      top5: result.rows
+    });
+
+  } catch (error) {
+    console.error("Erreur Top 5 :", error);
 
     res.status(500).json({
       message: "Erreur serveur."
@@ -137,5 +221,6 @@ router.delete("/:movie_id", authMiddleware, async (req, res) => {
     });
   }
 });
+
 
 export default router;

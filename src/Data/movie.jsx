@@ -19,7 +19,7 @@ export const MOVIES = [
     poster: "/images/lodyssee.jpeg",
     banner: "/images/lodyssee-banner.png",
     background:
-      "linear-gradient(to bottom, rgb(7, 7, 7), rgb(124, 74, 17))",
+      "linear-gradient(to bottom, rgb(7, 7, 7), rgb(36, 42, 110))",
     trailer:
       "https://www.youtube.com/embed/dQw4w9WgXcQ",
   },

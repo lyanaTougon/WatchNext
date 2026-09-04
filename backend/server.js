@@ -6,8 +6,10 @@ import pool from "./config/database.js";
 import authRoutes from "./routes/auth.js";
 import favorisRoutes from "./routes/favoris.js";
 import ratingsRoutes from "./routes/ratings.js";
+import adminRoutes from "./routes/admin.js";
 
 import authMiddleware from "./middleware/auth.js";
+
 
 dotenv.config();
 
@@ -32,6 +34,7 @@ app.use(express.json());
 // ========================================
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 // ========================================

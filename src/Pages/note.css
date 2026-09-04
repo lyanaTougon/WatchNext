@@ -1,4 +1,552 @@
+/* ============================================================
+   PAGE NOTES
+============================================================ */
+
 .note-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+  box-sizing: border-box;
   color: white;
-  padding: 1rem 0;
+}
+
+
+/* ============================================================
+   EN-TÊTE
+============================================================ */
+
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+
+  margin-bottom: 2.5rem;
+}
+
+.note-header h1 {
+  margin: 0;
+
+  font-size: 2.4rem;
+  font-weight: 800;
+
+  color: white;
+}
+
+.note-header p {
+  margin: 0.5rem 0 0;
+
+  color: #bdbdbd;
+
+  font-size: 0.95rem;
+}
+
+
+/* ============================================================
+   COMPTEUR
+============================================================ */
+
+.note-count {
+  flex-shrink: 0;
+
+  padding: 0.65rem 1rem;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+
+.note-message {
+  display: inline-block;
+
+  margin-bottom: 1.5rem;
+
+  padding: 0.8rem 1rem;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  color: white;
+
+  font-size: 0.85rem;
+}
+
+
+/* ============================================================
+   GRILLE
+============================================================ */
+
+.notes-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1.5rem;
+}
+
+
+/* ============================================================
+   CARTE
+============================================================ */
+
+.note-card {
+  display: flex;
+
+  gap: 1.3rem;
+
+  min-height: 240px;
+
+  padding: 1rem;
+
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.note-card:hover {
+  transform: translateY(-4px);
+
+  background: rgba(255, 255, 255, 0.09);
+
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+
+/* ============================================================
+   AFFICHE
+============================================================ */
+
+.note-card-poster {
+  width: 145px;
+  height: 215px;
+
+  flex-shrink: 0;
+
+  object-fit: cover;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.4);
+
+  transition:
+    transform 0.25s ease;
+}
+
+.note-card-poster:hover {
+  transform: scale(1.03);
+}
+
+
+/* ============================================================
+   CONTENU
+============================================================ */
+
+.note-card-content {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  min-width: 0;
+
+  padding: 0.4rem 0;
+}
+
+
+/* ============================================================
+   TITRE
+============================================================ */
+
+.note-card-title {
+  padding: 0;
+
+  margin: 0 0 0.5rem;
+
+  background: none;
+
+  border: none;
+
+  color: white;
+
+  font-size: 1.25rem;
+
+  font-weight: 800;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.note-card-title:hover {
+  color: #ffd700;
+}
+
+
+/* ============================================================
+   GENRE
+============================================================ */
+
+.note-card-genre {
+  display: inline-flex;
+
+  width: fit-content;
+
+  padding: 0.35rem 0.75rem;
+
+  margin-bottom: 1rem;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: #d4d4d4;
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   ÉTOILES
+============================================================ */
+
+.note-card-stars {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.08rem;
+
+  margin-bottom: 0.35rem;
+}
+
+.small-star {
+  color: rgba(255, 255, 255, 0.2);
+
+  font-size: 1.25rem;
+
+  line-height: 1;
+}
+
+.small-star.active {
+  color: #ffd700;
+
+  text-shadow:
+    0 0 7px rgba(255, 215, 0, 0.25);
+}
+
+
+/* ============================================================
+   VALEUR DE LA NOTE
+============================================================ */
+
+.note-value {
+  margin: 0;
+
+  color: #bdbdbd;
+
+  font-size: 0.85rem;
+}
+
+.note-value strong {
+  color: white;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   BOUTON SUPPRIMER
+============================================================ */
+
+.delete-note-button {
+  margin-top: auto;
+
+  padding: 0.55rem 0.85rem;
+
+  border-radius: 9px;
+
+  border: 1px solid rgba(255, 90, 100, 0.3);
+
+  background: rgba(255, 70, 80, 0.08);
+
+  color: #ffb8bd;
+
+  font-size: 0.75rem;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.delete-note-button:hover {
+  background: rgba(255, 70, 80, 0.18);
+
+  border-color: rgba(255, 90, 100, 0.55);
+
+  transform: translateY(-2px);
+}
+
+
+/* ============================================================
+   PAGE VIDE
+============================================================ */
+
+.note-empty {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 400px;
+
+  padding: 3rem 2rem;
+
+  box-sizing: border-box;
+
+  text-align: center;
+}
+
+.note-empty-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 80px;
+  height: 80px;
+
+  margin-bottom: 1.5rem;
+
+  border-radius: 50%;
+
+  background: rgba(255, 215, 0, 0.08);
+
+  border: 1px solid rgba(255, 215, 0, 0.2);
+
+  font-size: 2.3rem;
+}
+
+.note-empty h1,
+.note-empty h2 {
+  margin: 0;
+
+  color: white;
+
+  font-size: 1.7rem;
+}
+
+.note-empty p {
+  max-width: 450px;
+
+  margin: 0.8rem 0 1.5rem;
+
+  color: #aaa;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   BOUTON CONNEXION / FILMS
+============================================================ */
+
+.note-login-button {
+  padding: 0.75rem 1.3rem;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: white;
+
+  color: #222;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.note-login-button:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+
+/* ============================================================
+   CHARGEMENT
+============================================================ */
+
+.note-loading {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 400px;
+
+  color: #aaa;
+
+  font-size: 0.9rem;
+}
+
+
+/* ============================================================
+   RESPONSIVE TABLETTE
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .note-page {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .note-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    margin-bottom: 2rem;
+  }
+
+  .note-header h1 {
+    font-size: 2rem;
+  }
+
+  .note-count {
+    align-self: flex-start;
+  }
+
+  .note-card {
+    gap: 1rem;
+
+    min-height: 190px;
+
+    padding: 0.8rem;
+  }
+
+  .note-card-poster {
+    width: 105px;
+    height: 155px;
+  }
+
+  .note-card-title {
+    font-size: 1rem;
+  }
+
+  .note-card-genre {
+    margin-bottom: 0.6rem;
+  }
+
+  .small-star {
+    font-size: 1rem;
+  }
+
+  .delete-note-button {
+    font-size: 0.7rem;
+
+    padding: 0.45rem 0.65rem;
+  }
+
+}
+
+
+/* ============================================================
+   TRÈS PETITS ÉCRANS
+============================================================ */
+
+@media (max-width: 400px) {
+
+  .note-card {
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+  }
+
+  .note-card-content {
+    align-items: center;
+
+    width: 100%;
+  }
+
+  .note-card-title {
+    text-align: center;
+  }
+
+  .note-card-poster {
+    width: 140px;
+    height: 205px;
+  }
+
+  .delete-note-button {
+    margin-top: 1rem;
+  }
+
 }

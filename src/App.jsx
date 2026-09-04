@@ -11,6 +11,7 @@ import {
   NavLink,
   useNavigate,
   useParams,
+  Navigate,
 } from "react-router-dom";
 
 import "./App.css";
@@ -22,6 +23,8 @@ import "./App.css";
 import Films from "./Pages/films.jsx";
 import Series from "./Pages/series.jsx";
 import SeConnecter from "./Pages/seconnecter.jsx";
+import Note from "./Pages/note.jsx";
+import Favoris from "./Pages/favoris.jsx";
 
 // ============================================================
 // IMPORT DES DONNÉES
@@ -34,16 +37,20 @@ import {
 } from "./Data/movie.jsx";
 
 // ============================================================
-// IMPORT DE LA PAGE DÉTAIL
+// IMPORT PAGE DÉTAIL
 // ============================================================
 
 import Details from "./details.jsx";
 
 // ============================================================
-// GESTION DES IMAGES
+// BASE URL
 // ============================================================
 
 const BASE_URL = import.meta.env.BASE_URL;
+
+// ============================================================
+// IMAGES
+// ============================================================
 
 function getImagePath(path) {
   if (!path) {
@@ -61,46 +68,52 @@ function getImagePath(path) {
 }
 
 // ============================================================
-// REDIRECTION VERS ACCUEIL APRÈS UN RECHARGEMENT
+// RÉCUPÉRER L'UTILISATEUR
 // ============================================================
 
-function ReloadToHome() {
-  const navigate = useNavigate();
+function getCurrentUser() {
+  const savedUser = localStorage.getItem("user");
 
-  useEffect(() => {
-    const navigation =
-      performance.getEntriesByType("navigation")[0];
+  if (!savedUser) {
+    return null;
+  }
 
-    if (
-      navigation &&
-      navigation.type === "reload"
-    ) {
-      const currentPath = window.location.pathname;
+  try {
+    return JSON.parse(savedUser);
+  } catch (error) {
+    console.error(
+      "Erreur récupération utilisateur :",
+      error
+    );
 
-      const basePath = BASE_URL.replace(/\/+$/, "");
+    return null;
+  }
+}
 
-      const isHome =
-        currentPath === "/" ||
-        currentPath === "" ||
-        currentPath === basePath ||
-        currentPath === `${basePath}/`;
+// ============================================================
+// PROTECTION DES PAGES UTILISATEUR
+// ============================================================
 
-      if (!isHome) {
-        navigate("/", {
-          replace: true,
-        });
-      }
-    }
-  }, [navigate]);
+function UserOnlyRoute({ children, user }) {
+  if (user?.role === "admin") {
+    return (
+      <Navigate
+        to="/se-connecter"
+        replace
+      />
+    );
+  }
 
-  return null;
+  return children;
 }
 
 // ============================================================
 // SIDEBAR
 // ============================================================
 
-function Sidebar() {
+function Sidebar({ user }) {
+  const admin = user?.role === "admin";
+
   return (
     <nav className="sidebar">
 
@@ -110,32 +123,41 @@ function Sidebar() {
 
       <ul className="sidebar-links">
 
-        <li>
-          <NavLink to="/" end>
-            Accueil
-          </NavLink>
-        </li>
+        {admin ? (
+          <li>
+            <NavLink to="/se-connecter">
+              👑 Administration
+            </NavLink>
+          </li>
+        ) : (
+          <>
+            <li>
+              <NavLink to="/" end>
+                Accueil
+              </NavLink>
+            </li>
 
-        <li>
-          <NavLink to="/favoris">
-            Favoris
-          </NavLink>
-        </li>
+            <li>
+              <NavLink to="/favoris">
+                Favoris
+              </NavLink>
+            </li>
 
-        <li>
-          <NavLink to="/note">
-            Notes
-          </NavLink>
-        </li>
+            <li>
+              <NavLink to="/note">
+                Notes
+              </NavLink>
+            </li>
 
-        <li>
-          <NavLink to="/se-connecter">
-            Se connecter
-          </NavLink>
-        </li>
+            <li>
+              <NavLink to="/se-connecter">
+                Mon compte
+              </NavLink>
+            </li>
+          </>
+        )}
 
       </ul>
-
     </nav>
   );
 }
@@ -144,44 +166,60 @@ function Sidebar() {
 // BARRE DU HAUT
 // ============================================================
 
-function TopNavbar() {
+function TopNavbar({ user }) {
   const navigate = useNavigate();
+  const admin = user?.role === "admin";
 
   return (
     <div className="top-navbar">
 
-      <ul className="top-navbar-links">
+      {admin ? (
+        <ul className="top-navbar-links">
+          <li>
+            <span className="admin-navbar-title">
+              👑 Espace administrateur
+            </span>
+          </li>
+        </ul>
+      ) : (
+        <ul className="top-navbar-links">
+          <li>
+            <NavLink to="/films">
+              Films
+            </NavLink>
+          </li>
 
-        <li>
-          <NavLink to="/films">
-            Films
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink to="/series">
-            Séries
-          </NavLink>
-        </li>
-
-      </ul>
+          <li>
+            <NavLink to="/series">
+              Séries
+            </NavLink>
+          </li>
+        </ul>
+      )}
 
       <div className="top-navbar-right">
 
         <button
           type="button"
           className="user-icon"
-          aria-label="Se connecter"
-          title="Se connecter"
+          aria-label={
+            admin
+              ? "Administration"
+              : "Mon compte"
+          }
+          title={
+            admin
+              ? "Administration"
+              : "Mon compte"
+          }
           onClick={() =>
             navigate("/se-connecter")
           }
         >
-          👤
+          {admin ? "👑" : "👤"}
         </button>
 
       </div>
-
     </div>
   );
 }
@@ -192,7 +230,6 @@ function TopNavbar() {
 
 function Carousel({ movies }) {
   const [index, setIndex] = useState(0);
-
   const navigate = useNavigate();
 
   const hasMovies =
@@ -202,10 +239,6 @@ function Carousel({ movies }) {
   const current = hasMovies
     ? movies[index]
     : null;
-
-  // ----------------------------------------------------------
-  // PRÉCHARGEMENT DES IMAGES
-  // ----------------------------------------------------------
 
   useEffect(() => {
     if (!hasMovies) {
@@ -221,10 +254,6 @@ function Carousel({ movies }) {
     });
   }, [movies, hasMovies]);
 
-  // ----------------------------------------------------------
-  // CHANGEMENT DU FOND
-  // ----------------------------------------------------------
-
   useEffect(() => {
     if (!current) {
       return;
@@ -238,10 +267,6 @@ function Carousel({ movies }) {
     };
   }, [current]);
 
-  // ----------------------------------------------------------
-  // FILM PRÉCÉDENT
-  // ----------------------------------------------------------
-
   function previousSlide() {
     setIndex((oldIndex) => {
       if (oldIndex === 0) {
@@ -251,10 +276,6 @@ function Carousel({ movies }) {
       return oldIndex - 1;
     });
   }
-
-  // ----------------------------------------------------------
-  // FILM SUIVANT
-  // ----------------------------------------------------------
 
   function nextSlide() {
     setIndex((oldIndex) => {
@@ -266,10 +287,6 @@ function Carousel({ movies }) {
     });
   }
 
-  // ----------------------------------------------------------
-  // VOIR PLUS
-  // ----------------------------------------------------------
-
   function voirPlus() {
     if (!current) {
       return;
@@ -278,17 +295,9 @@ function Carousel({ movies }) {
     navigate(`/film/${current.id}`);
   }
 
-  // ----------------------------------------------------------
-  // AUCUN FILM
-  // ----------------------------------------------------------
-
   if (!hasMovies || !current) {
     return null;
   }
-
-  // ----------------------------------------------------------
-  // AFFICHAGE
-  // ----------------------------------------------------------
 
   return (
     <div className="carousel">
@@ -310,7 +319,6 @@ function Carousel({ movies }) {
         />
 
         <div className="carousel-info">
-
           <h3>
             {current.title}
           </h3>
@@ -318,7 +326,6 @@ function Carousel({ movies }) {
           <p className="carousel-synopsis">
             {current.synopsis}
           </p>
-
         </div>
 
         <button
@@ -352,13 +359,12 @@ function Carousel({ movies }) {
         </div>
 
       </div>
-
     </div>
   );
 }
 
 // ============================================================
-// PAGE ACCUEIL
+// ACCUEIL
 // ============================================================
 
 function Accueil() {
@@ -408,70 +414,33 @@ function Accueil() {
                 type="button"
                 className="movie-card-view"
                 onClick={() =>
-                  navigate(`/film/${movie.id}`)
+                  navigate(
+                    `/film/${movie.id}`
+                  )
                 }
               >
                 Voir
               </button>
 
             </div>
-
           </div>
 
         ))}
 
       </div>
-
     </div>
   );
 }
 
 // ============================================================
-// PAGE FAVORIS
-// ============================================================
-
-function Favoris() {
-  return (
-    <div className="page-simple">
-
-      <h2>
-        Page Favoris
-      </h2>
-
-    </div>
-  );
-}
-
-// ============================================================
-// PAGE NOTES
-// ============================================================
-
-function Note() {
-  return (
-    <div className="page-simple">
-
-      <h2>
-        Page Notes
-      </h2>
-
-    </div>
-  );
-}
-
-// ============================================================
-// PAGE DÉTAIL
+// DÉTAIL FILM / SÉRIE
 // ============================================================
 
 function FilmDetail() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const movie = findMovieById(id);
-
-  // ----------------------------------------------------------
-  // FOND DE LA PAGE
-  // ----------------------------------------------------------
 
   useEffect(() => {
     if (!movie) {
@@ -486,10 +455,6 @@ function FilmDetail() {
     };
   }, [movie]);
 
-  // ----------------------------------------------------------
-  // FILM INTROUVABLE
-  // ----------------------------------------------------------
-
   if (!movie) {
     return (
       <div className="film-detail">
@@ -501,7 +466,9 @@ function FilmDetail() {
         <button
           type="button"
           className="back-button"
-          onClick={() => navigate("/")}
+          onClick={() =>
+            navigate("/")
+          }
         >
           ← Retour à l'accueil
         </button>
@@ -509,10 +476,6 @@ function FilmDetail() {
       </div>
     );
   }
-
-  // ----------------------------------------------------------
-  // PAGE DÉTAILS
-  // ----------------------------------------------------------
 
   return (
     <Details movie={movie} />
@@ -524,82 +487,133 @@ function FilmDetail() {
 // ============================================================
 
 function App() {
+
+  const [user, setUser] = useState(
+    getCurrentUser()
+  );
+
+  useEffect(() => {
+
+    function updateUser() {
+      setUser(getCurrentUser());
+    }
+
+    window.addEventListener(
+      "storage",
+      updateUser
+    );
+
+    const interval = setInterval(
+      updateUser,
+      500
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "storage",
+        updateUser
+      );
+
+      clearInterval(interval);
+    };
+
+  }, []);
+
   return (
     <BrowserRouter basename={BASE_URL}>
 
-      <ReloadToHome />
-
       <div className="app">
 
-        {/* SIDEBAR */}
-
-        <Sidebar />
+        <Sidebar user={user} />
 
         <div className="app-content">
 
-          {/* BARRE DU HAUT */}
-
-          <TopNavbar />
+          <TopNavbar user={user} />
 
           <main className="page-content">
 
             <Routes>
 
-              {/* ACCUEIL */}
-
               <Route
                 path="/"
-                element={<Accueil />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <Accueil />
+                  </UserOnlyRoute>
+                }
               />
-
-              {/* FILMS */}
 
               <Route
                 path="/films"
-                element={<Films />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <Films />
+                  </UserOnlyRoute>
+                }
               />
-
-              {/* SÉRIES */}
 
               <Route
                 path="/series"
-                element={<Series />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <Series />
+                  </UserOnlyRoute>
+                }
               />
-
-              {/* FAVORIS */}
 
               <Route
                 path="/favoris"
-                element={<Favoris />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <Favoris />
+                  </UserOnlyRoute>
+                }
               />
-
-              {/* NOTES */}
 
               <Route
                 path="/note"
-                element={<Note />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <Note />
+                  </UserOnlyRoute>
+                }
               />
-
-              {/* SE CONNECTER */}
 
               <Route
                 path="/se-connecter"
-                element={<SeConnecter />}
+                element={
+                  <SeConnecter />
+                }
               />
-
-              {/* DÉTAIL FILM / SÉRIE */}
 
               <Route
                 path="/film/:id"
-                element={<FilmDetail />}
+                element={
+                  <UserOnlyRoute user={user}>
+                    <FilmDetail />
+                  </UserOnlyRoute>
+                }
+              />
+
+              <Route
+                path="*"
+                element={
+                  <Navigate
+                    to={
+                      user?.role === "admin"
+                        ? "/se-connecter"
+                        : "/"
+                    }
+                    replace
+                  />
+                }
               />
 
             </Routes>
 
           </main>
-
         </div>
-
       </div>
 
     </BrowserRouter>

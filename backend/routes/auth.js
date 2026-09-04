@@ -33,9 +33,10 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO users (username, email, password)
-       VALUES ($1, $2, $3)
-       RETURNING id, username, email, created_at`,
+      `INSERT INTO users
+       (username, email, password, role)
+       VALUES ($1, $2, $3, 'user')
+       RETURNING id, username, email, role, created_at`,
       [username, email, hashedPassword]
     );
 
@@ -71,7 +72,9 @@ router.post("/login", async (req, res) => {
 
     // Recherche de l'utilisateur
     const result = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
+      `SELECT id, username, email, password, role
+       FROM users
+       WHERE email = $1`,
       [email]
     );
 
@@ -101,7 +104,8 @@ router.post("/login", async (req, res) => {
       {
         id: user.id,
         email: user.email,
-        username: user.username
+        username: user.username,
+        role: user.role
       },
       process.env.JWT_SECRET,
       {
@@ -112,11 +116,12 @@ router.post("/login", async (req, res) => {
     // Réponse
     res.json({
       message: "Connexion réussie !",
-      token,
+      token: token,
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        role: user.role
       }
     });
 

@@ -4,8 +4,16 @@
 
 .series-page {
   width: 100%;
+  min-height: 100vh;
   padding: 2rem;
   box-sizing: border-box;
+
+  background: linear-gradient(
+    135deg,
+    #181818 0%,
+    #252525 50%,
+    #303030 100%
+  );
 }
 
 /* ============================================================
@@ -276,6 +284,143 @@
   font-size: 0.9rem;
 
   margin: 0;
+}
+
+/* ============================================================
+   NOTES
+============================================================ */
+
+.rating-stars {
+  font-size: 1rem;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.series-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.series-rating-stars {
+  display: flex;
+}
+
+.series-rating strong {
+  font-size: 0.9rem;
+}
+
+.series-rating small {
+  opacity: 0.7;
+}
+
+.no-rating {
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
+
+/* ============================================================
+   TOP 5
+============================================================ */
+
+.top-rated-section {
+  margin: 40px 0;
+}
+
+.top-rated-header {
+  margin-bottom: 20px;
+}
+
+.top-rated-header h2 {
+  margin-bottom: 8px;
+}
+
+.top-rated-header p {
+  opacity: 0.7;
+}
+
+.top-rated-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.top-rated-card {
+  position: relative;
+  cursor: pointer;
+  border-radius: 15px;
+  overflow: hidden;
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.top-rated-card:hover {
+  transform: translateY(-5px);
+}
+
+.top-rated-card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+}
+
+.top-position {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  font-size: 1.2rem;
+}
+
+.top-rated-info {
+  padding: 15px;
+}
+
+.top-rated-info h3 {
+  margin: 0 0 10px;
+}
+
+.average-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-count {
+  display: block;
+  margin-top: 5px;
+  opacity: 0.6;
+  font-size: 0.8rem;
+}
+
+
+/* ============================================================
+   RESPONSIVE TOP 5
+============================================================ */
+
+@media (max-width: 1000px) {
+  .top-rated-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .top-rated-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 450px) {
+  .top-rated-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ============================================================
