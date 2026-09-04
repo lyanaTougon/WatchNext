@@ -1,4 +1,4 @@
-/* ---------------- PAGE DÉTAIL FILM ---------------- */
+/* ---------------- PAGE DÉTAIL ---------------- */
 
 .film-detail {
   padding: 1.5rem 0 3rem;
@@ -84,6 +84,113 @@
   margin: 0.5rem 0 0;
 }
 
+
+/* ========================================
+   BOUTON FAVORIS ❤️
+======================================== */
+
+.favorite-button {
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 0.5rem;
+}
+
+.favorite-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.favorite-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.favorite-active {
+  background: rgba(255, 60, 90, 0.2);
+  border-color: rgba(255, 80, 100, 0.6);
+}
+
+.favorite-active:hover {
+  background: rgba(255, 60, 90, 0.3);
+}
+
+
+/* ========================================
+   SYSTÈME DE NOTES ⭐
+======================================== */
+
+.rating-section {
+  margin-top: 0.5rem;
+}
+
+.rating-section h3 {
+  color: white;
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.star {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0.1rem;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.star:hover {
+  transform: scale(1.12);
+}
+
+.star.active {
+  color: #ffd700;
+}
+
+.star:disabled {
+  cursor: not-allowed;
+}
+
+.rating-text {
+  color: #e6e6e6;
+  font-size: 0.85rem;
+  margin: 0.3rem 0 0;
+}
+
+
+/* ========================================
+   MESSAGE APRÈS UNE ACTION
+======================================== */
+
+.action-message {
+  color: #e6e6e6;
+  font-size: 0.85rem;
+  margin: 0.2rem 0 0;
+}
+
+
+/* ========================================
+   BANDE-ANNONCE
+======================================== */
+
 .film-detail-trailer h2 {
   color: white;
   font-size: 1.2rem;
@@ -110,6 +217,11 @@
   border: none;
 }
 
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
 @media (max-width: 640px) {
   .film-detail-header {
     flex-direction: column;
@@ -119,5 +231,13 @@
 
   .film-detail-info {
     align-items: center;
+  }
+
+  .stars {
+    justify-content: center;
+  }
+
+  .favorite-button {
+    align-self: center;
   }
 }

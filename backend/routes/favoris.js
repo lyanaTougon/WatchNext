@@ -4,67 +4,51 @@ import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
+
 // ========================================
-// AJOUTER OU MODIFIER UNE NOTE
+// AJOUTER UN FILM AUX FAVORIS
 // ========================================
 
 router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { movie_id, rating } = req.body;
+    const { movie_id } = req.body;
     const user_id = req.user.id;
 
-    // Vérification des champs
-    if (!movie_id || rating === undefined) {
+    // Vérifier que movie_id existe
+    if (!movie_id) {
       return res.status(400).json({
-        message: "L'identifiant du film et la note sont obligatoires."
+        message: "L'identifiant du film est obligatoire."
       });
     }
 
-    // Vérification de la note
-    if (rating < 0.5 || rating > 5) {
-      return res.status(400).json({
-        message: "La note doit être comprise entre 0.5 et 5."
-      });
-    }
-
-    // Vérifier si une note existe déjà
-    const existingRating = await pool.query(
-      `SELECT * FROM ratings
+    // Vérifier si le film est déjà dans les favoris
+    const existingFavorite = await pool.query(
+      `SELECT * FROM favorites
        WHERE user_id = $1 AND movie_id = $2`,
       [user_id, movie_id]
     );
 
-    // Si une note existe → modification
-    if (existingRating.rows.length > 0) {
-      const result = await pool.query(
-        `UPDATE ratings
-         SET rating = $1
-         WHERE user_id = $2 AND movie_id = $3
-         RETURNING *`,
-        [rating, user_id, movie_id]
-      );
-
-      return res.json({
-        message: "Note modifiée avec succès !",
-        rating: result.rows[0]
+    if (existingFavorite.rows.length > 0) {
+      return res.status(409).json({
+        message: "Ce film est déjà dans vos favoris."
       });
     }
 
-    // Sinon → nouvelle note
+    // Ajouter le film aux favoris
     const result = await pool.query(
-      `INSERT INTO ratings (user_id, movie_id, rating)
-       VALUES ($1, $2, $3)
+      `INSERT INTO favorites (user_id, movie_id)
+       VALUES ($1, $2)
        RETURNING *`,
-      [user_id, movie_id, rating]
+      [user_id, movie_id]
     );
 
     res.status(201).json({
-      message: "Note ajoutée avec succès !",
-      rating: result.rows[0]
+      message: "Film ajouté aux favoris !",
+      favorite: result.rows[0]
     });
 
   } catch (error) {
-    console.error("Erreur ajout/modification note :", error);
+    console.error("Erreur ajout favori :", error);
 
     res.status(500).json({
       message: "Erreur serveur."
@@ -74,7 +58,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
 
 // ========================================
-// RÉCUPÉRER LES NOTES DE L'UTILISATEUR
+// RÉCUPÉRER LES FAVORIS
 // ========================================
 
 router.get("/", authMiddleware, async (req, res) => {
@@ -82,18 +66,18 @@ router.get("/", authMiddleware, async (req, res) => {
     const user_id = req.user.id;
 
     const result = await pool.query(
-      `SELECT * FROM ratings
+      `SELECT * FROM favorites
        WHERE user_id = $1
        ORDER BY created_at DESC`,
       [user_id]
     );
 
     res.json({
-      ratings: result.rows
+      favorites: result.rows
     });
 
   } catch (error) {
-    console.error("Erreur récupération notes :", error);
+    console.error("Erreur récupération favoris :", error);
 
     res.status(500).json({
       message: "Erreur serveur."
@@ -103,7 +87,7 @@ router.get("/", authMiddleware, async (req, res) => {
 
 
 // ========================================
-// SUPPRIMER UNE NOTE
+// SUPPRIMER UN FAVORI
 // ========================================
 
 router.delete("/:movie_id", authMiddleware, async (req, res) => {
@@ -112,7 +96,7 @@ router.delete("/:movie_id", authMiddleware, async (req, res) => {
     const { movie_id } = req.params;
 
     const result = await pool.query(
-      `DELETE FROM ratings
+      `DELETE FROM favorites
        WHERE user_id = $1 AND movie_id = $2
        RETURNING *`,
       [user_id, movie_id]
@@ -120,22 +104,23 @@ router.delete("/:movie_id", authMiddleware, async (req, res) => {
 
     if (result.rows.length === 0) {
       return res.status(404).json({
-        message: "Aucune note trouvée pour ce film."
+        message: "Ce film n'est pas dans vos favoris."
       });
     }
 
     res.json({
-      message: "Note supprimée avec succès !",
-      rating: result.rows[0]
+      message: "Film retiré des favoris !",
+      favorite: result.rows[0]
     });
 
   } catch (error) {
-    console.error("Erreur suppression note :", error);
+    console.error("Erreur suppression favori :", error);
 
     res.status(500).json({
       message: "Erreur serveur."
     });
   }
 });
+
 
 export default router;

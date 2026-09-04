@@ -21,6 +21,7 @@ import "./App.css";
 
 import Films from "./Pages/films.jsx";
 import Series from "./Pages/series.jsx";
+import SeConnecter from "./Pages/seconnecter.jsx";
 
 // ============================================================
 // IMPORT DES DONNÉES
@@ -128,8 +129,8 @@ function Sidebar() {
         </li>
 
         <li>
-          <NavLink to="/apropos">
-            À propos
+          <NavLink to="/se-connecter">
+            Se connecter
           </NavLink>
         </li>
 
@@ -366,10 +367,6 @@ function Accueil() {
   return (
     <div className="home-main">
 
-      {/* ======================================================
-          CAROUSEL
-      ====================================================== */}
-
       <h2 className="section-title">
         4 suggestions de films / séries 🎬
       </h2>
@@ -377,10 +374,6 @@ function Accueil() {
       <Carousel
         movies={CAROUSEL_MOVIES}
       />
-
-      {/* ======================================================
-          DERNIERS FILMS / SÉRIES
-      ====================================================== */}
 
       <h2 className="section-title">
         4 derniers films / séries récemment ajoutés 🎬
@@ -466,38 +459,6 @@ function Note() {
 }
 
 // ============================================================
-// PAGE À PROPOS
-// ============================================================
-
-function APropos() {
-  return (
-    <div className="page-simple">
-
-      <h2>
-        À propos
-      </h2>
-
-    </div>
-  );
-}
-
-// ============================================================
-// PAGE CONNEXION
-// ============================================================
-
-function Seconnecter() {
-  return (
-    <div className="page-simple">
-
-      <h2>
-        Se connecter
-      </h2>
-
-    </div>
-  );
-}
-
-// ============================================================
 // PAGE DÉTAIL
 // ============================================================
 
@@ -550,7 +511,7 @@ function FilmDetail() {
   }
 
   // ----------------------------------------------------------
-  // PAGE DETAILS
+  // PAGE DÉTAILS
   // ----------------------------------------------------------
 
   return (
@@ -565,8 +526,6 @@ function FilmDetail() {
 function App() {
   return (
     <BrowserRouter basename={BASE_URL}>
-
-      {/* Redirection après actualisation */}
 
       <ReloadToHome />
 
@@ -586,72 +545,49 @@ function App() {
 
             <Routes>
 
-              {/* ==================================================
-                  ACCUEIL
-              ================================================== */}
+              {/* ACCUEIL */}
 
               <Route
                 path="/"
                 element={<Accueil />}
               />
 
-              {/* ==================================================
-                  FILMS
-              ================================================== */}
+              {/* FILMS */}
 
               <Route
                 path="/films"
                 element={<Films />}
               />
 
-              {/* ==================================================
-                  SÉRIES
-              ================================================== */}
+              {/* SÉRIES */}
 
               <Route
                 path="/series"
                 element={<Series />}
               />
 
-              {/* ==================================================
-                  FAVORIS
-              ================================================== */}
+              {/* FAVORIS */}
 
               <Route
                 path="/favoris"
                 element={<Favoris />}
               />
 
-              {/* ==================================================
-                  NOTES
-              ================================================== */}
+              {/* NOTES */}
 
               <Route
                 path="/note"
                 element={<Note />}
               />
 
-              {/* ==================================================
-                  À PROPOS
-              ================================================== */}
-
-              <Route
-                path="/apropos"
-                element={<APropos />}
-              />
-
-              {/* ==================================================
-                  CONNEXION
-              ================================================== */}
+              {/* SE CONNECTER */}
 
               <Route
                 path="/se-connecter"
-                element={<Seconnecter />}
+                element={<SeConnecter />}
               />
 
-              {/* ==================================================
-                  DÉTAIL D'UN FILM OU D'UNE SÉRIE
-              ================================================== */}
+              {/* DÉTAIL FILM / SÉRIE */}
 
               <Route
                 path="/film/:id"
